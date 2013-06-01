@@ -1,5 +1,5 @@
 
-public class Bot {
+public class Bot implements MoveMaker {
 	Board gameBd;
 	short player;
 	short opponent;
@@ -8,96 +8,23 @@ public class Bot {
 	int bestColMove = -1;
 	IMoveScorer scorer;
 	
-	private class EightMatrixMoveScorer extends MoveScorer {
-		@Override 
-		public void scoreMove(short[] bd) {
-			score = 0;
-			/*
-			 64 -8 8 8 8 8 -8 64
-			 -8 -8 0 0 0 0 -8 -8
-			  8  0 0 0 0 0  0  8
-			  8  0 0 0 0 0  0  8
-			  8  0 0 0 0 0  0  8
-			  8  0 0 0 0 0  0  8
-			 -8 -8 0 0 0 0 -8 -8
-			 64 -8 8 8 8 8 -8 64
-			 */
-			int [] scoringMatrix = new int [] 
-					{64, -8, 8, 8, 8, 8, -8, 64,
-					-8, -8, 0, 0, 0, 0, -8, -8,
-					8, 0, 0, 0, 0, 0, 0, 8,
-					8, 0, 0, 0, 0, 0, 0, 8,
-					8, 0, 0, 0, 0, 0, 0, 8,
-					8, 0, 0, 0, 0, 0, 0, 8,
-					-8, -8, 0, 0, 0, 0, -8, -8,
-					64, -8, 8, 8, 8, 8, -8, 64};
-			for (int idx = 0; idx < bd.length; idx++) {
-				if(bd[idx] == Piece.WHITE) {
-					score += scoringMatrix[idx];
-				} else if(bd[idx] == Piece.BLACK) {
-					score -= scoringMatrix[idx];
-				}
-			}
-		}
-	}
-	private class SimpleMoveScorer extends MoveScorer {
-		@Override
-		//only call when game is not over/making a move
-		public void scoreMove(short[] bd) {
-			score = 0;
-			for (int idx = 0; idx < bd.length; idx++) {
-				if (bd[idx] == Piece.WHITE) {
-					score++;
-				} else if(bd[idx] == Piece.BLACK) {
-					score--;
-				}
-			}
-		}
-		
-	}
-	public abstract class MoveScorer implements IMoveScorer {
-		protected int score = 0;
-		@Override 
-		public int getScore() {
-			return score;
-			
-		}
-
-		// only call when game is over
-		public int scoreBoard(short [] bd) {
-			int gamescore = 0;
-			for (int idx = 0; idx < bd.length; idx++) {
-	
-				if (bd[idx] == Piece.WHITE) {
-					gamescore++;
-				} else if(bd[idx] == Piece.BLACK) {
-					gamescore--;
-				}
-		
-			}
-			
-			if (gamescore == 0) {
-				return 0;
-			} else {
-				return gamescore < 0 ? Integer.MIN_VALUE : Integer.MAX_VALUE;
-			}
-		}
-		@Override 
-		public void reset() {
-			
-		}
-	}
-	public Bot(Board board, short player, int depth) {
+	public Bot(Board board, short player, int depth, IMoveScorer scorerChoice) {
 		gameBd = board;
 		this.player = player;
 		this.depth = depth;
 		opponent = Piece.otherPiece(player);	
-		if(board.dim == 8) {
-			scorer = new EightMatrixMoveScorer();
-		} else {
-			scorer = new SimpleMoveScorer();
-		}
+		scorer = scorerChoice;
+		
 	}
+	/*
+	public Bot(Board board, short player, int depth) {
+		MoveScore
+		if(board.dim == 8) {
+			scorerChoice = new EightMatrixMoveScorer();
+		} else {
+			scorerChoice = new SimpleMoveScorer();
+		}
+	}*/
 
 	private void updateBestMove(int row, int col) {
 		this.bestRowMove = row;
@@ -172,11 +99,19 @@ public class Bot {
 		
 	}
 	
+	@Override
 	public void makeMove() {
 		int optScore = findOptimalMove(gameBd.board, gameBd.dim, this.player, scorer, this.depth, true);
-		System.out.println(String.format("making move: (%d,%d) with score %d", bestRowMove, bestColMove, optScore));
+		System.out.println(String.format("%s making move: (%d,%d) with score %d (%s currently winning)", 
+				Piece.toString(player), bestRowMove, bestColMove, optScore, 
+				Piece.toString(optScore > 0 ? Piece.WHITE: Piece.BLACK)));
 		gameBd.makeMove(bestRowMove, bestColMove, this.player);
 		this.clear();
+	}
+	
+	@Override
+	public short getColor() {
+		return this.player;
 	}
 }
 

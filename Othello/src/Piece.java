@@ -8,7 +8,7 @@ public final class Piece {
 	}
 	public static String toString(short curPiece) {
 		return curPiece == WHITE ? 
-				"WHITE" : 
-			((curPiece == BLACK) ? "BLACK" : "EMPTY");
+				"White" : 
+			((curPiece == BLACK) ? "Black" : "Empty");
 	}
 }
