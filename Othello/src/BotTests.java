@@ -1,12 +1,40 @@
+import java.util.Iterator;
+
 
 public class BotTests {
 	final static int depth = 6;
 	public void run() {
-		boolean passed = test1();
+		boolean passed = true;
+
+		passed &= testIterable();
+		System.out.println("testIterable: " + passed);
+		
+		passed &= test1();
 		System.out.println("test1: " + passed);
+
 		passed &= test2(20);
 		System.out.println("test2: " + passed);
+		
 
+
+	}
+	public boolean testIterable() {
+		AlphaBetaSearchSortAlgorithm algo = new AlphaBetaSearchSortAlgorithm(4, 16, 8, 3, 3);
+		AlphaBetaSearchSortAlgorithm.AlphaBetaFullIterable it = algo.getFullIterable();
+		
+		Iterator<AlphaBetaSearchSortAlgorithm.AlphaBetaSortMove> iter = it.iterator();
+		for (int i=0; i < 4; i++) {
+			for (int j=0; j < 4; j++) {
+				if(!iter.hasNext()){
+					return false;
+				}
+				AlphaBetaSearchSortAlgorithm.AlphaBetaSortMove m = iter.next();
+				if (m.row != i || m.col != j) {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 	public boolean test1() {
 		Board minimaxBoard = new Board(8);
@@ -60,7 +88,7 @@ public class BotTests {
 		return true;
 	}
 	private Bot getBot(boolean minimax, short botColor, Board b) {
-		return new Bot(b, botColor, depth, new EightMatrixMoveScorer(), minimax);
+		return new Bot(b, botColor, depth, new EightMatrixMoveScorer(), minimax, false);
 
 	}
 }

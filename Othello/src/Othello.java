@@ -65,18 +65,32 @@ public class Othello {
 	
 	private static Bot getBot(Scanner sc, Board b, short botColor) {
 		System.out.println("Choices for " + Piece.toString(botColor) + ":");
-		System.out.println("1) MatrixScorer \n2) SimpleScorer");
+		System.out.println("1) MatrixScorer \n2) SimpleScorer\n3) LibertyScorer");
 		int scorerChoice = parseInt(sc, 1);
 		System.out.println("Use 1) Minimax 2) Alpha-Beta Pruning");
 		int algoChoice = parseInt(sc, 1);
+		boolean sortedAlpha = false;
+		if (algoChoice == 2) {
+			System.out.println("sorted alpha-beta? (y/n)");
+			sortedAlpha = getYesNo(sc);
+		}
 		int depth = getBotDepth(sc);
 		IMoveScorer moveScorer;
-		if(scorerChoice == 1) {
-			moveScorer = new EightMatrixMoveScorer();
-		} else {
-			moveScorer = new SimpleMoveScorer();
+		switch (scorerChoice) {
+			case 1:
+				moveScorer = new EightMatrixMoveScorer();
+				break;
+			case 2:
+				moveScorer = new SimpleMoveScorer();
+				break;
+			case 3:
+				moveScorer = new LibertyMoveScorer();
+				break;
+			default:
+				moveScorer = new EightMatrixMoveScorer();
+				break;
 		}
-		return new Bot(b, botColor, depth, moveScorer, algoChoice == 1);
+		return new Bot(b, botColor, depth, moveScorer, algoChoice == 1, sortedAlpha);
 	}
 	
 	private static int parseInt (Scanner sc, int defaultValue){

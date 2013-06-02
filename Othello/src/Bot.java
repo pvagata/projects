@@ -10,14 +10,16 @@ public class Bot implements MoveMaker {
 	boolean minimax;
 	SearchAlgorithm searchAlgorithm;
 	
-	public Bot(Board board, short player, int depth, IMoveScorer scorerChoice, boolean useMinimax) {
+	public Bot(Board board, short player, int depth, IMoveScorer scorerChoice, boolean useMinimax, boolean sortAlphaBeta) {
 		gameBd = board;
 		this.player = player;
 		this.depth = depth;
 		opponent = Piece.otherPiece(player);	
 		scorer = scorerChoice;
 		minimax = useMinimax;
-		searchAlgorithm = minimax ? new MinimaxSearchAlgorithm() : new AlphaBetaSearchAlgorithm(board.board.length, depth);
+		searchAlgorithm = minimax ? new MinimaxSearchAlgorithm() : sortAlphaBeta? 
+				new AlphaBetaSearchSortAlgorithm(board.dim, board.board.length, depth, 2, 11) :
+				new AlphaBetaSearchAlgorithm(board.board.length, depth);
 	}
 	
 	@Override
