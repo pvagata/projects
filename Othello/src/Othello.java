@@ -14,39 +14,45 @@ public class Othello {
 				System.out.println("May the odds be ever in your favor...");
 				Scanner sc = new Scanner(System.in);
 				Board b = getBoard(sc);
-				boolean runtest = runTest(sc);
-				MoveMaker blackPlayer;
-				MoveMaker whitePlayer;
-				if (!runtest) {
-					boolean playComputer = playAgainstComputerChoice(sc);
-					short player = getPlayerChoice(sc);
-					if(playComputer) {
-						MoveMaker botPlayer;
-						MoveMaker humanPlayer;
-	
-						humanPlayer = new HumanMoveMaker(sc, b, player);
-						botPlayer = getBot(sc, b, Piece.otherPiece(player));
-						
-						if (player == Piece.BLACK) {
-							blackPlayer = humanPlayer;
-							whitePlayer = botPlayer;
-						} else {
-							blackPlayer = botPlayer;
-							whitePlayer = humanPlayer;
-						}
-					} else {
-						blackPlayer = new HumanMoveMaker(sc, b, player);
-						whitePlayer = new HumanMoveMaker(sc, b, Piece.otherPiece(player));
-					}
-	
+				boolean runTestChoice = runTestChoice(sc);
+
+				if(runTestChoice) {
+					runTests();
 				} else {
-					blackPlayer = getBot(sc, b, Piece.BLACK);
-					whitePlayer = getBot(sc, b, Piece.WHITE);
-					
+					boolean playBots = runBotVsBot(sc);
+					MoveMaker blackPlayer;
+					MoveMaker whitePlayer;
+					if (!playBots) {
+						boolean playComputer = playAgainstComputerChoice(sc);
+						short player = getPlayerChoice(sc);
+						if(playComputer) {
+							MoveMaker botPlayer;
+							MoveMaker humanPlayer;
+		
+							humanPlayer = new HumanMoveMaker(sc, b, player);
+							botPlayer = getBot(sc, b, Piece.otherPiece(player));
+							
+							if (player == Piece.BLACK) {
+								blackPlayer = humanPlayer;
+								whitePlayer = botPlayer;
+							} else {
+								blackPlayer = botPlayer;
+								whitePlayer = humanPlayer;
+							}
+						} else {
+							blackPlayer = new HumanMoveMaker(sc, b, player);
+							whitePlayer = new HumanMoveMaker(sc, b, Piece.otherPiece(player));
+						}
+		
+					} else {
+						blackPlayer = getBot(sc, b, Piece.BLACK);
+						whitePlayer = getBot(sc, b, Piece.WHITE);
+						
+					}
+					repl(b, blackPlayer, whitePlayer);
+					System.out.println("Again? ");
+					playAgain = getYesNo(sc);
 				}
-				repl(b, blackPlayer, whitePlayer);
-				System.out.println("Again? ");
-				playAgain = getYesNo(sc);
 				
 			}
 
@@ -61,6 +67,8 @@ public class Othello {
 		System.out.println("Choices for " + Piece.toString(botColor) + ":");
 		System.out.println("1) MatrixScorer \n2) SimpleScorer");
 		int scorerChoice = parseInt(sc, 1);
+		System.out.println("Use 1) Minimax 2) Alpha-Beta Pruning");
+		int algoChoice = parseInt(sc, 1);
 		int depth = getBotDepth(sc);
 		IMoveScorer moveScorer;
 		if(scorerChoice == 1) {
@@ -68,7 +76,7 @@ public class Othello {
 		} else {
 			moveScorer = new SimpleMoveScorer();
 		}
-		return new Bot(b, botColor, depth, moveScorer);
+		return new Bot(b, botColor, depth, moveScorer, algoChoice == 1);
 	}
 	
 	private static int parseInt (Scanner sc, int defaultValue){
@@ -97,7 +105,15 @@ public class Othello {
 		}
 		return true;
 	}
-	private static boolean runTest(Scanner sc) {
+	private static void runTests() {
+		BotTests bt = new BotTests();
+		bt.run();
+	}
+	private static boolean runTestChoice(Scanner sc) {
+		System.out.println("run test? (y/n)");
+		return getYesNo(sc);
+	}
+	private static boolean runBotVsBot(Scanner sc) {
 		System.out.println("Bot-on-Bot action? (y/n)");
 		return getYesNo(sc);
 	}
@@ -148,57 +164,9 @@ public class Othello {
 			}
 			
 			b.printBoard();
-		}
-		short winner = b.getWinner();
-		if(winner == Piece.NULL) {
-			
-		} else {
-			System.out.println(String.format("we have a victor(%s)! the loser(%s) will be executed in a slow and painful manner. ", Piece.toString(winner), Piece.toString(Piece.otherPiece(winner))));
-		}
-		b.printBoard();
-	}
-	/*
-	private static void repl(Scanner sc, Board b, boolean playComputer, short player) throws IOException {
+			System.out.println(blackPlayer + " took " + blackPlayer.getElapsedTime());
+			System.out.println(whitePlayer + " took " + whitePlayer.getElapsedTime());
 
-		short otherPlayer = Piece.NULL;
-		short curPlayer = Piece.NULL;
-		
-		if (player == Piece.BLACK) {
-			otherPlayer = Piece.WHITE;
-			curPlayer = player;
-		} else {
-			otherPlayer = Piece.BLACK;
-			curPlayer = otherPlayer;
-		}
-		
-		Bot bot = null;
-		if(playComputer) {
-			
-			bot = new Bot(b, otherPlayer, getBotDepth(sc));
-		}
-		boolean gameOver = false;
-		while (!gameOver) {
-			if (playComputer && curPlayer == bot.player) {
-				bot.makeMove();
-			} else {
-				playerMove(sc, b, curPlayer);
-			}
-			
-			otherPlayer = Piece.otherPiece(curPlayer);
-			// swap players if other player has remaining moves
-			if(b.hasRemainingMoves(otherPlayer)){
-				curPlayer = otherPlayer; 
-			} else {
-				// check if curPlayer has remaining moves
-				if(!b.hasRemainingMoves(curPlayer)) {
-					// if neither player has any moves left, GAME IS OVER!
-					gameOver = false;
-					break;
-				}
-				
-			}
-			
-			b.printBoard();
 		}
 		short winner = b.getWinner();
 		if(winner == Piece.NULL) {
@@ -208,7 +176,6 @@ public class Othello {
 		}
 		b.printBoard();
 	}
-	*/
 	private static short getPlayerChoice(Scanner sc){
 		short player = Piece.NULL;
 		while (player == Piece.NULL) {

@@ -33,4 +33,15 @@ public class HumanMoveMaker implements MoveMaker {
 		return color;
 	}
 
+	@Override
+	public void updateBestMove(int row, int col) {
+		// pass
+	}
+
+	@Override
+	public double getElapsedTime() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 }

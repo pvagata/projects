@@ -2,6 +2,7 @@
 public class EightMatrixMoveScorer extends MoveScorer {
 		@Override 
 		public void scoreMove(short[] bd) {
+			leaves++;
 			score = 0;
 			/*
 			 64 -8 8 8 8 8 -8 64

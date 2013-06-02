@@ -6,5 +6,6 @@ public interface MoveMaker {
 	 */
 	public void makeMove();
 	public short getColor();
-
+	public void updateBestMove(int row, int col);
+	public double getElapsedTime();
 }
