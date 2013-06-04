@@ -8,7 +8,14 @@ public class BoardPool {
 
 	int numBoards;
 	public BoardPool(int dim, int depth) {
-		numBoards = depth;
+		this(dim, new int[] {depth});
+	}
+	public BoardPool(int dim, int [] depths) {
+		int sum = 0;
+		for (int d = 0; d < depths.length; d++) {
+			sum += depths[d];
+		}
+		numBoards = sum;
 		whiteBoards = new ArrayList<short[]>(numBoards);
 		blackBoards = new ArrayList<short[]>(numBoards);
 

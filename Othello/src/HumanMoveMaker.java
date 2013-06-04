@@ -12,7 +12,7 @@ public class HumanMoveMaker implements MoveMaker {
 	}
 	
 	@Override
-	public void makeMove() {
+	public void makeMove(int move) {
 		boolean validMove = false;
 		System.out.println("Talking to you, " + Piece.toString(color));
 		while (!validMove) {

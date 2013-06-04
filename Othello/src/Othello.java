@@ -73,8 +73,15 @@ public class Othello {
 		if (algoChoice == 2) {
 			System.out.println("sorted alpha-beta? (y/n)");
 			sortedAlpha = getYesNo(sc);
+
+	
 		}
-		int depth = getBotDepth(sc);
+		System.out.println("dynamic depth? (y/n)");
+		boolean dynamicDepth =  getYesNo(sc);
+		int depth = 8;
+		if (!dynamicDepth) {
+			depth = getBotDepth(sc);
+		}
 		IMoveScorer moveScorer;
 		switch (scorerChoice) {
 			case 1:
@@ -90,7 +97,7 @@ public class Othello {
 				moveScorer = new EightMatrixMoveScorer();
 				break;
 		}
-		return new Bot(b, botColor, depth, moveScorer, algoChoice == 1, sortedAlpha);
+		return new Bot(b, botColor, depth, moveScorer, algoChoice == 1, sortedAlpha, dynamicDepth);
 	}
 	
 	private static int parseInt (Scanner sc, int defaultValue){
@@ -156,13 +163,14 @@ public class Othello {
 		
 		
 		boolean gameOver = false;
+		int move = 0;
 		while (!gameOver) {
 			if (curPlayer == blackPlayer.getColor()) {
-				blackPlayer.makeMove();
+				blackPlayer.makeMove(move);
 			} else {
-				whitePlayer.makeMove();
+				whitePlayer.makeMove(move);
 			}
-
+			move++;
 			nextPlayer = Piece.otherPiece(curPlayer);
 			// swap players if other player has remaining moves
 			if(b.hasRemainingMoves(nextPlayer)){

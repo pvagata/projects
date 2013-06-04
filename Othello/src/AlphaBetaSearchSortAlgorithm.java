@@ -13,6 +13,7 @@ public class AlphaBetaSearchSortAlgorithm extends SearchAlgorithm {
 	int dimension;
 	int width;
 	int sortedDepthLimit = 2;
+	int depth;
 	public class AlphaBetaSortMove {
 		int row;
 		int col; 
@@ -73,6 +74,7 @@ public class AlphaBetaSearchSortAlgorithm extends SearchAlgorithm {
 		this.width = width;
 		boardPool = new BoardPool(dim, depth);
 		this.sortLevel = sortLevel;
+		this.depth = depth;
 	}
 	
 	@Override
@@ -250,6 +252,12 @@ public class AlphaBetaSearchSortAlgorithm extends SearchAlgorithm {
 				return scorer.scoreBoard(curBoard);
 			}
 		}
+	}
+
+	@Override
+	public int getDepth(int move) {
+		// TODO Auto-generated method stub
+		return depth;
 	}
 }
 

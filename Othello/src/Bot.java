@@ -8,17 +8,21 @@ public class Bot implements MoveMaker {
 	int bestColMove = -1;
 	IMoveScorer scorer;
 	boolean minimax;
+	boolean dynamicDepth;
 	SearchAlgorithm searchAlgorithm;
+
 	
-	public Bot(Board board, short player, int depth, IMoveScorer scorerChoice, boolean useMinimax, boolean sortAlphaBeta) {
+	public Bot(Board board, short player, int depth, IMoveScorer scorerChoice, boolean useMinimax, boolean sortAlphaBeta, boolean dynamicDepth) {
 		gameBd = board;
 		this.player = player;
 		this.depth = depth;
 		opponent = Piece.otherPiece(player);	
 		scorer = scorerChoice;
 		minimax = useMinimax;
-		searchAlgorithm = minimax ? new MinimaxSearchAlgorithm() : sortAlphaBeta? 
+		this.dynamicDepth = dynamicDepth;
+		searchAlgorithm = minimax ? new MinimaxSearchAlgorithm(depth) : sortAlphaBeta? 
 				new AlphaBetaSearchSortAlgorithm(board.dim, board.board.length, depth, 2, 11) :
+				dynamicDepth ? new AlphaBetaSearchDynamicDepth(board.board.length, depth) :
 				new AlphaBetaSearchAlgorithm(board.board.length, depth);
 	}
 	
@@ -37,24 +41,23 @@ public class Bot implements MoveMaker {
 	double totalSeconds = 0.0;
 	
 	@Override
-	public void makeMove() {
+	public void makeMove(int move) {
 		long startTime = System.currentTimeMillis();
-		int optScore = searchAlgorithm.findOptimalMove(gameBd.board, gameBd.dim, this.player, scorer, this.depth, this.depth, true, this);
-				
-		System.out.println(String.format("%s making move: (%d,%d) with score %d (%s currently winning)", 
-				Piece.toString(player), bestRowMove, bestColMove, optScore, 
-				Piece.toString(optScore > 0 ? Piece.WHITE: Piece.BLACK)));
+		int movedepth = searchAlgorithm.getDepth(move);
+		int optScore = searchAlgorithm.findOptimalMove(gameBd.board, gameBd.dim, this.player, scorer, movedepth, movedepth, true, this);
 		long endTime = System.currentTimeMillis();
+		System.out.println(String.format("%s making move (%d): (%d,%d) with score %d (%s currently winning)", 
+				Piece.toString(player), move, bestRowMove, bestColMove, optScore, 
+				Piece.toString(optScore > 0 ? Piece.WHITE: Piece.BLACK)));
+		
+				
 		gameBd.makeMove(bestRowMove, bestColMove, this.player);
-		System.out.println("evaluated " + scorer.getNumberLeaves() + " boards");
+		System.out.println("evaluated " + scorer.getNumberLeaves() + " boards at depth (" + movedepth + ")");
 		double elapsedSeconds = ((endTime - startTime)/1000.0);
 		System.out.println("elapsed time (seconds): " + elapsedSeconds);
 		totalSeconds += elapsedSeconds;
 		System.out.println("Boards/second " + (scorer.getNumberLeaves() / elapsedSeconds));
 		System.out.println();
-		//if (!minimax)
-		//	System.out.println("pruned events " + numberPruned);
-
 		this.clear();
 	}
 	
@@ -68,7 +71,8 @@ public class Bot implements MoveMaker {
 		return "color: " + Piece.toString(this.player) +
 				", depth: " + this.depth + 
 				", Scorer: " + scorer.getClass().getName() + 
-				", search algorithm: " + (minimax ? "Minimax" : "alpha-beta pruning");
+				", search algorithm: " + (minimax ? "Minimax" : "alpha-beta pruning") + 
+				", Dynamic Depth: " + dynamicDepth;
 	}
 
 	@Override

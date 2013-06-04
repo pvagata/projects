@@ -1,5 +1,9 @@
 
 public class MinimaxSearchAlgorithm extends SearchAlgorithm {
+	int depth;
+	public MinimaxSearchAlgorithm (int depth) {
+		this.depth = depth;
+	}
 	@Override
 	public int findOptimalMove(short[] board, int dim, short curPlayer, IMoveScorer scorer, int depth, 
 			int curDepth, boolean hadPrevValidMove, MoveMaker moveMaker) {
@@ -62,5 +66,11 @@ public class MinimaxSearchAlgorithm extends SearchAlgorithm {
 				return scorer.scoreBoard(curBoard);
 			}
 		}
+	}
+
+	@Override
+	public int getDepth(int move) {
+		// TODO Auto-generated method stub
+		return depth;
 	}
 }

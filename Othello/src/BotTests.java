@@ -41,8 +41,8 @@ public class BotTests {
 		Board alphabetaBoard = new Board(8);
 		Bot minimaxBot = getBot(true, Piece.BLACK, minimaxBoard);
 		Bot alphabetaBot = getBot(false, Piece.BLACK, alphabetaBoard);
-		minimaxBot.makeMove();
-		alphabetaBot.makeMove();
+		minimaxBot.makeMove(0);
+		alphabetaBot.makeMove(0);
 		boolean sameMoveMade = boardsEqual(minimaxBoard.board, alphabetaBoard.board);
 		return sameMoveMade &&
 				alphabetaBot.scorer.scoreBoard(alphabetaBoard.board) == 
@@ -61,12 +61,12 @@ public class BotTests {
 		short cur = Piece.BLACK;
 		for (int i = 0; i < numMoves; i++) {
 			if(cur == Piece.BLACK) {
-				minimaxBotBlack.makeMove();
-				alphabetaBotBlack.makeMove();
+				minimaxBotBlack.makeMove(i);
+				alphabetaBotBlack.makeMove(i);
 				prev = cur;
 			} else {
-				minimaxBotWhite.makeMove();
-				minimaxBotWhite2.makeMove();
+				minimaxBotWhite.makeMove(i);
+				minimaxBotWhite2.makeMove(i);
 			}
 			cur = Piece.otherPiece(cur);
 
@@ -88,7 +88,7 @@ public class BotTests {
 		return true;
 	}
 	private Bot getBot(boolean minimax, short botColor, Board b) {
-		return new Bot(b, botColor, depth, new EightMatrixMoveScorer(), minimax, false);
+		return new Bot(b, botColor, depth, new EightMatrixMoveScorer(), minimax, false, false);
 
 	}
 }

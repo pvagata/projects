@@ -1,26 +1,31 @@
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
 
+public class AlphaBetaSearchDynamicDepth extends SearchAlgorithm {
 
-public class AlphaBetaSearchAlgorithm extends SearchAlgorithm {
 	final BoardPool boardPool;
 	public int numberPruned = 0;
 	int dimension;
-	int depth;
+	int [] depths = new int[64];
 	
-	public AlphaBetaSearchAlgorithm(int dim, int depth) {
+	
+	public AlphaBetaSearchDynamicDepth(int dim, int maxDepth) {
+		for (int i = 0; i < 64; i++) {
+			if (i < 10) {
+				depths[i] = 12;
+			} else if (i < 37) {
+				depths[i] = 10;
+			} else if (i < 46) {
+				depths[i] = 12;
+			} else {
+				depths[i] = 22;
+			}
+		}
 		this.dimension = dim;
-		boardPool = new BoardPool(dim, depth);
-		this.depth = depth;
+		boardPool = new BoardPool(dim, depths);
 	}
+	
 	
 	@Override
 	public int findOptimalMove(short[] board, int dim, short curPlayer, IMoveScorer scorer, int depth, int curDepth, boolean hadPrevValidMove, MoveMaker moveMaker) {
-		//return alphaBetaSortedMove(board, dim, curPlayer, scorer, depth, curDepth, sortedDepthLimit, hadPrevValidMove,  moveMaker, Integer.MIN_VALUE, Integer.MAX_VALUE);
 		return alphaBetaMove(board, dim, curPlayer, scorer, depth, curDepth, hadPrevValidMove,  moveMaker, Integer.MIN_VALUE, Integer.MAX_VALUE);
 	} 
 	
@@ -122,9 +127,11 @@ public class AlphaBetaSearchAlgorithm extends SearchAlgorithm {
 		}
 	}
 
+
 	@Override
 	public int getDepth(int move) {
 		// TODO Auto-generated method stub
-		return depth;
+		return depths[move];
 	}
 }
+
